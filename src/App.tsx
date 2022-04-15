@@ -4,6 +4,11 @@ import Game from "./Game";
 import { useEffect, useState } from "react";
 import { About } from "./About";
 import { Stats } from "./Stats";
+import ReactGA from "react-ga4";
+
+// initialize GA4 property
+// TODO: will have to update this ID to your GA4 measurement ID
+ReactGA.initialize("G-SVTBVJGSCW");
 
 function App() {
   type Page = "game" | "about" | "settings" | "stats";
@@ -25,11 +30,13 @@ function App() {
     // if (urlParam("today") !== null || urlParam("todas") !== null) {
     //   document.location = "?seed=" + todaySeed;
     // }
+    // send pageview on page update
+    ReactGA.send({ hitType: "pageview", page: page });
     setTimeout(() => {
       // Avoid transition on page load
       document.body.style.transition = "0.3s background-color ease-out";
     }, 1);
-  }, [dark]);
+  }, [dark, page]);
 
   const link = (emoji: string, label: string, page: Page) => (
     <button

@@ -16,6 +16,7 @@ import {
   indexOfToday
 } from "./util";
 import { decode, encode } from "./base64";
+import ReactGA from "react-ga4";
 
 enum GameState {
   Playing,
@@ -174,6 +175,13 @@ function Game(props: GameProps) {
     try {
       await navigator.clipboard.writeText(body);
       setHint(copiedHint);
+      // send ga4 share score event
+      ReactGA.event({
+        category: "engagement",
+        action: "share_score",
+        label: "Share score",
+        nonInteraction: false,
+      });
       return;
     } catch (e) {
       console.warn("navigator.clipboard.writeText failed:", e);
@@ -226,11 +234,23 @@ function Game(props: GameProps) {
         let newStats = updateStats(stats, guesses, false, gameNumber, currentGuess);
         setStats(newStats);
         setGameState(GameState.Won);
+        ReactGA.event({
+          category: "engagement",
+          action: "game_completed",
+          label: "Game won",
+          nonInteraction: false,
+        });
       } else if (guesses.length + 1 === props.maxGuesses) {
         setHint(gameOver("lost"));
         let newStats = updateStats(stats, guesses, true, gameNumber, currentGuess);
         setStats(newStats);
         setGameState(GameState.Lost);
+        ReactGA.event({
+          category: "engagement",
+          action: "game_completed",
+          label: "Game lost",
+          nonInteraction: false,
+        });
       } else {
         setHint("");
         speak(describeClue(clue(currentGuess, target)));
